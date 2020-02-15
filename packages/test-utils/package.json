@@ -1,0 +1,56 @@
+{
+  "name": "@react-navigation/test-utils",
+  "description": "Utilities to write unit tests with React Navigation",
+  "version": "5.0.0",
+  "keywords": [
+    "react",
+    "react-native",
+    "react-navigation"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/react-navigation/react-navigation/tree/master/packages/test-utils",
+  "bugs": {
+    "url": "https://github.com/react-navigation/react-navigation/issues"
+  },
+  "homepage": "https://reactnavigation.org",
+  "main": "lib/commonjs/index.js",
+  "module": "lib/module/index.js",
+  "types": "lib/typescript/src/index.d.ts",
+  "files": [
+    "src",
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "prepare": "bob build",
+    "clean": "del lib"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@react-native-community/bob": "^0.9.3",
+    "@types/react": "^16.9.19",
+    "del-cli": "^3.0.0",
+    "react": "~16.9.0",
+    "typescript": "^3.7.5"
+  },
+  "peerDependencies": {
+    "@react-navigation/native": ">= 5.0.0",
+    "react": "*"
+  },
+  "@react-native-community/bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  }
+}
