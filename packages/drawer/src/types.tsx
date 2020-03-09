@@ -181,7 +181,22 @@ export type DrawerNavigationEventMap = {
 export type DrawerNavigationHelpers = NavigationHelpers<
   ParamListBase,
   DrawerNavigationEventMap
->;
+> & {
+  /**
+   * Open the drawer sidebar.
+   */
+  openDrawer(): void;
+
+  /**
+   * Close the drawer sidebar.
+   */
+  closeDrawer(): void;
+
+  /**
+   * Open the drawer sidebar if closed, or close if opened.
+   */
+  toggleDrawer(): void;
+};
 
 export type DrawerNavigationProp<
   ParamList extends ParamListBase,

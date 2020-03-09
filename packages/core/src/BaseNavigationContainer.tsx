@@ -7,6 +7,7 @@ import {
   PartialState,
   NavigationAction,
 } from '@react-navigation/routers';
+import { NavigationContext } from '@react-navigation/core';
 import EnsureSingleNavigator from './EnsureSingleNavigator';
 import NavigationBuilderContext from './NavigationBuilderContext';
 import useFocusedListeners from './useFocusedListeners';
@@ -265,7 +266,9 @@ const BaseNavigationContainer = React.forwardRef(
     return (
       <NavigationBuilderContext.Provider value={builderContext}>
         <NavigationStateContext.Provider value={context}>
-          <EnsureSingleNavigator>{children}</EnsureSingleNavigator>
+          <NavigationContext.Provider value={undefined}>
+            <EnsureSingleNavigator>{children}</EnsureSingleNavigator>
+          </NavigationContext.Provider>
         </NavigationStateContext.Provider>
       </NavigationBuilderContext.Provider>
     );

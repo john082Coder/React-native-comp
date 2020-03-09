@@ -54,6 +54,7 @@ import DynamicTabs from './Screens/DynamicTabs';
 import AuthFlow from './Screens/AuthFlow';
 import CompatAPI from './Screens/CompatAPI';
 import SettingsItem from './Shared/SettingsItem';
+import Test from './Screens/Test';
 
 YellowBox.ignoreWarnings(['Require cycle:', 'Warning: Async Storage']);
 
@@ -71,6 +72,7 @@ type RootStackParamList = {
 };
 
 const SCREENS = {
+  Test: { title: 'TEST', component: Test },
   SimpleStack: { title: 'Simple Stack', component: SimpleStack },
   ModalPresentationStack: {
     title: 'Modal Presentation Stack',
