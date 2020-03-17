@@ -673,23 +673,3 @@ it('accepts initialRouteName without config for it', () => {
     state
   );
 });
-
-it('returns undefined if path is empty', () => {
-  const config = {
-    Main: {
-      path: 'Main',
-      screens: {
-        Landing: 'landing',
-        ShoppingCart: 'restaurants/:restaurantId/cart',
-        Restaurant: 'restaurants/:restaurantId',
-        RestaurantList: 'restaurants',
-        VerifyPayment: 'verify',
-        Settings: 'settings',
-      },
-    },
-  };
-
-  const path = '/Main';
-
-  expect(getStateFromPath(path, config)).toEqual(undefined);
-});

@@ -1,72 +1,53 @@
 import * as React from 'react';
-import { View, TextInput, Button } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { enableScreens } from 'react-native-screens';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-enableScreens();
+import { View, Text } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem,
+  useIsDrawerOpen,
+} from '@react-navigation/drawer';
 
-function HomeScreen({ navigation }) {
+function Feed() {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <TextInput
-        placeholder="try to copy/paste here on Android"
-        style={{ fontSize: 20 }}
-      />
-      <Button
-        title="nav"
-        onPress={() => {
-          navigation.navigate('Second', { screen: 'Cos' });
-        }}
-      />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Feed Screen</Text>
     </View>
   );
 }
 
-function Settings({ navigation }) {
+function Article() {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <TextInput placeholder="try dfs" style={{ fontSize: 20 }} />
-      <Button
-        title="nav"
-        onPress={() => {
-          navigation.navigate('Cos');
-        }}
-      />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Article Screen</Text>
     </View>
   );
 }
 
-function Cos({ navigation }) {
+function CustomDrawerContent(props) {
+  const open = useIsDrawerOpen();
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Button
-        title="nav"
-        onPress={() => {
-          navigation.navigate('Settings');
-        }}
-      />
-    </View>
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+      <DrawerItem label="Help" onPress={() => alert(open)} />
+    </DrawerContentScrollView>
   );
 }
 
-function S() {
+const Drawer = createDrawerNavigator();
+
+function MyDrawer() {
   return (
-    <Stack.Navigator initialRouteName="Settings" mode="modal">
-      <Stack.Screen name="Settings" component={Settings} />
-      <Stack.Screen name="Cos" component={Cos} />
-    </Stack.Navigator>
+    <Drawer.Navigator
+      drawerContent={props => <CustomDrawerContent {...props} />}
+    >
+      <Drawer.Screen name="Feed" component={Feed} />
+      <Drawer.Screen name="Article" component={Article} />
+    </Drawer.Navigator>
   );
 }
 
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
-function App() {
-  return (
-    <Tab.Navigator lazy={false}>
-      <Tab.Screen name="Tabs" component={HomeScreen} />
-      <Tab.Screen name="Second" component={S} />
-    </Tab.Navigator>
-  );
+export default function App() {
+  return <MyDrawer />;
 }
-
-export default App;

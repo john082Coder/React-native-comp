@@ -34,6 +34,10 @@ import {
 import {
   createDrawerNavigator,
   DrawerNavigationProp,
+  DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem,
+  useIsDrawerOpen,
 } from '@react-navigation/drawer';
 import {
   createStackNavigator,
@@ -114,6 +118,17 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
+
+function CustomDrawerContent(props) {
+  console.warn(Object.keys(props.navigation));
+  const open = useIsDrawerOpen(props.navigation);
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+      <DrawerItem label="Help" onPress={() => alert(open)} />
+    </DrawerContentScrollView>
+  );
+}
 
 Asset.loadAsync(StackAssets);
 
@@ -234,7 +249,9 @@ export default function App() {
         }
         theme={theme}
       >
-        <Drawer.Navigator drawerType={isLargeScreen ? 'permanent' : undefined}>
+        <Drawer.Navigator
+          drawerContent={props => <CustomDrawerContent {...props} />}
+        >
           <Drawer.Screen
             name="Root"
             options={{
