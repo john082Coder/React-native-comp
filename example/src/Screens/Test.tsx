@@ -1,53 +1,68 @@
-import * as React from 'react';
-import { View, Text } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import React from 'react';
+import { Button, Text, View } from 'react-native';
 import {
-  createDrawerNavigator,
-  DrawerContentScrollView,
-  DrawerItemList,
-  DrawerItem,
-  useIsDrawerOpen,
-} from '@react-navigation/drawer';
+  createStackNavigator,
+  TransitionPresets,
+} from '@react-navigation/stack';
 
-function Feed() {
+function CardScreen1(props) {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Feed Screen</Text>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Card Screen 1</Text>
+      <Button
+        title="To next screen"
+        onPress={() => props.navigation.navigate('Card2')}
+      />
     </View>
   );
 }
 
-function Article() {
+function CardScreen2(props) {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Article Screen</Text>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Card Screen 2</Text>
+      <Button
+        title="Open modal"
+        onPress={() => props.navigation.navigate('Modal')}
+      />
     </View>
   );
 }
 
-function CustomDrawerContent(props) {
-  const open = useIsDrawerOpen();
+const CardStack = createStackNavigator();
+
+function CardsNavigator() {
   return (
-    <DrawerContentScrollView {...props}>
-      <DrawerItemList {...props} />
-      <DrawerItem label="Help" onPress={() => alert(open)} />
-    </DrawerContentScrollView>
+    <CardStack.Navigator>
+      <CardStack.Screen name="Card1" component={CardScreen1} />
+      <CardStack.Screen name="Card2" component={CardScreen2} />
+    </CardStack.Navigator>
   );
 }
 
-const Drawer = createDrawerNavigator();
+const ModalStack = createStackNavigator();
 
-function MyDrawer() {
+function ModalScreen() {
   return (
-    <Drawer.Navigator
-      drawerContent={props => <CustomDrawerContent {...props} />}
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Text>Modal Screen</Text>
+    </View>
+  );
+}
+
+function App() {
+  return (
+    <ModalStack.Navigator
+      mode="modal"
+      screenOptions={{
+        ...TransitionPresets.ModalPresentationIOS,
+        cardOverlayEnabled: true,
+      }}
     >
-      <Drawer.Screen name="Feed" component={Feed} />
-      <Drawer.Screen name="Article" component={Article} />
-    </Drawer.Navigator>
+      <ModalStack.Screen name="Cards" component={CardsNavigator} />
+      <ModalStack.Screen name="Modal" component={ModalScreen} />
+    </ModalStack.Navigator>
   );
 }
 
-export default function App() {
-  return <MyDrawer />;
-}
+export default App;

@@ -120,7 +120,6 @@ const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 function CustomDrawerContent(props) {
-  console.warn(Object.keys(props.navigation));
   const open = useIsDrawerOpen(props.navigation);
   return (
     <DrawerContentScrollView {...props}>
@@ -269,6 +268,7 @@ export default function App() {
               <Stack.Navigator
                 screenOptions={{
                   headerStyleInterpolator: HeaderStyleInterpolators.forUIKit,
+                  headerShown: false,
                 }}
               >
                 <Stack.Screen
