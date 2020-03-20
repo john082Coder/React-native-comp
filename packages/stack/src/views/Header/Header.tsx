@@ -56,7 +56,7 @@ export default React.memo(function Header(props: StackHeaderProps) {
   return (
     <HeaderSegment
       {...options}
-      insets={insets}
+      insets={{ ...insets, top: previous ? 0 : insets.top }}
       layout={layout}
       scene={scene}
       title={title}
