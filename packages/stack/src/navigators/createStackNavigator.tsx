@@ -39,13 +39,20 @@ function StackNavigator({
     initialRouteName,
     children,
     screenOptions,
-    defaultScreenOptions: {
+    defaultScreenOptions: ({ options }) => ({
+      presentation: 'card',
+      headerMode:
+        options.presentation !== 'modal' && Platform.OS === 'ios'
+          ? 'float'
+          : 'screen',
+      cardOverlayEnabled:
+        Platform.OS !== 'ios' || options.presentation === 'modal',
       gestureEnabled: Platform.OS === 'ios',
       animationEnabled:
         Platform.OS !== 'web' &&
         Platform.OS !== 'windows' &&
         Platform.OS !== 'macos',
-    },
+    }),
   });
 
   React.useEffect(

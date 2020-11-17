@@ -83,7 +83,7 @@ export default function SimpleStackScreen({ navigation, ...rest }: Props) {
   }, [navigation]);
 
   return (
-    <SimpleStack.Navigator mode="modal" {...rest}>
+    <SimpleStack.Navigator {...rest}>
       <SimpleStack.Screen
         name="Article"
         component={ArticleScreen}
@@ -94,6 +94,7 @@ export default function SimpleStackScreen({ navigation, ...rest }: Props) {
         component={DialogScreen}
         options={{
           headerShown: false,
+          presentation: 'modal',
           cardStyle: { backgroundColor: 'transparent' },
           cardOverlayEnabled: true,
           cardStyleInterpolator: ({ current: { progress } }) => ({

@@ -285,10 +285,22 @@ export type StackNavigationOptions = StackHeaderOptions &
      */
     header?: (props: StackHeaderProps) => React.ReactNode;
     /**
-     * Whether to show the header. The header is shown by default unless `headerMode` was set to `none`.
+     * Whether to show the header. The header is shown by default.
      * Setting this to `false` hides the header.
      */
     headerShown?: boolean;
+    /**
+     * Controls how the header is displayed.
+     * - 'float' - The header floats on top of all screens and animates separately.
+     * - 'screen' - The header is part of the screen.
+     */
+    headerMode?: StackHeaderMode;
+    /**
+     * Controls how the screen is presented and animated.
+     * - 'card' - The screen animates as regular screens.
+     * - 'modal' - The screen animates like a modal.
+     */
+    presentation?: StackCardMode;
     /**
      * Whether a shadow is visible for the card during transitions. Defaults to `true`.
      */
@@ -370,8 +382,6 @@ export type StackNavigationOptions = StackHeaderOptions &
   };
 
 export type StackNavigationConfig = {
-  mode?: StackCardMode;
-  headerMode?: StackHeaderMode;
   /**
    * If `false`, the keyboard will NOT automatically dismiss when navigating to a new screen.
    * Defaults to `true`.

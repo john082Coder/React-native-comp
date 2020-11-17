@@ -4,7 +4,6 @@ import {
   StyleSheet,
   LayoutChangeEvent,
   Dimensions,
-  Platform,
 } from 'react-native';
 import type { EdgeInsets } from 'react-native-safe-area-context';
 import type {
@@ -25,13 +24,10 @@ import {
   DefaultTransition,
   ModalTransition,
 } from '../../TransitionConfigs/TransitionPresets';
-import { forNoAnimation as forNoAnimationHeader } from '../../TransitionConfigs/HeaderStyleInterpolators';
 import { forNoAnimation as forNoAnimationCard } from '../../TransitionConfigs/CardStyleInterpolators';
 import getDistanceForDirection from '../../utils/getDistanceForDirection';
 import type {
   Layout,
-  StackHeaderMode,
-  StackCardMode,
   StackDescriptorMap,
   StackNavigationOptions,
   StackDescriptor,
@@ -43,7 +39,6 @@ type GestureValues = {
 };
 
 type Props = {
-  mode: StackCardMode;
   insets: EdgeInsets;
   state: StackNavigationState<ParamListBase>;
   descriptors: StackDescriptorMap;
@@ -58,7 +53,6 @@ type Props = {
   getGesturesEnabled: (props: { route: Route<string> }) => boolean;
   renderHeader: (props: HeaderContainerProps) => React.ReactNode;
   renderScene: (props: { route: Route<string> }) => React.ReactNode;
-  headerMode: StackHeaderMode;
   isParentHeaderShown: boolean;
   onTransitionStart: (
     props: { route: Route<string> },
@@ -125,12 +119,11 @@ const getHeaderHeights = (
 };
 
 const getDistanceFromOptions = (
-  mode: StackCardMode,
   layout: Layout,
   descriptor?: StackDescriptor
 ) => {
   const {
-    gestureDirection = mode === 'modal'
+    gestureDirection = descriptor?.options.presentation === 'modal'
       ? ModalTransition.gestureDirection
       : DefaultTransition.gestureDirection,
   } = descriptor?.options || {};
@@ -139,13 +132,11 @@ const getDistanceFromOptions = (
 };
 
 const getProgressFromGesture = (
-  mode: StackCardMode,
   gesture: Animated.Value,
   layout: Layout,
   descriptor?: StackDescriptor
 ) => {
   const distance = getDistanceFromOptions(
-    mode,
     {
       // Make sure that we have a non-zero distance, otherwise there will be incorrect progress
       // This causes blank screen on web if it was previously inside container with display: none
@@ -186,7 +177,7 @@ export default class CardStack extends React.Component<Props, State> {
         new Animated.Value(
           props.openingRouteKeys.includes(curr.key) &&
           animationEnabled !== false
-            ? getDistanceFromOptions(props.mode, state.layout, descriptor)
+            ? getDistanceFromOptions(state.layout, descriptor)
             : 0
         );
 
@@ -225,14 +216,12 @@ export default class CardStack extends React.Component<Props, State> {
           descriptor,
           progress: {
             current: getProgressFromGesture(
-              props.mode,
               currentGesture,
               state.layout,
               descriptor
             ),
             next: nextGesture
               ? getProgressFromGesture(
-                  props.mode,
                   nextGesture,
                   state.layout,
                   nextDescriptor
@@ -240,7 +229,6 @@ export default class CardStack extends React.Component<Props, State> {
               : undefined,
             previous: previousGesture
               ? getProgressFromGesture(
-                  props.mode,
                   previousGesture,
                   state.layout,
                   previousDescriptor
@@ -375,7 +363,6 @@ export default class CardStack extends React.Component<Props, State> {
 
   render() {
     const {
-      mode,
       insets,
       descriptors,
       state,
@@ -386,7 +373,6 @@ export default class CardStack extends React.Component<Props, State> {
       getGesturesEnabled,
       renderHeader,
       renderScene,
-      headerMode,
       isParentHeaderShown,
       onTransitionStart,
       onTransitionEnd,
@@ -408,16 +394,6 @@ export default class CardStack extends React.Component<Props, State> {
     const focusedOptions = focusedDescriptor ? focusedDescriptor.options : {};
     const focusedHeaderHeight = headerHeights[focusedRoute.key];
 
-    let defaultTransitionPreset =
-      mode === 'modal' ? ModalTransition : DefaultTransition;
-
-    if (headerMode !== 'float') {
-      defaultTransitionPreset = {
-        ...defaultTransitionPreset,
-        headerStyleInterpolator: forNoAnimationHeader,
-      };
-    }
-
     const {
       top = insets.top,
       right = insets.right,
@@ -430,7 +406,7 @@ export default class CardStack extends React.Component<Props, State> {
     for (let i = scenes.length - 1; i >= 0; i--) {
       const {
         // By default, we don't want to detach the previous screen of the active one for modals
-        detachPreviousScreen = mode === 'modal'
+        detachPreviousScreen = focusedOptions.presentation === 'modal'
           ? i !== scenes.length - 1
           : true,
       } = scenes[i].descriptor.options;
@@ -442,51 +418,42 @@ export default class CardStack extends React.Component<Props, State> {
       }
     }
 
-    const isFloatHeaderAbsolute =
-      headerMode === 'float'
-        ? this.state.scenes.slice(-2).some((scene) => {
-            const { descriptor } = scene;
-            const options = descriptor ? descriptor.options : {};
-            const { headerTransparent, headerShown = true } = options;
+    const isFloatHeaderAbsolute = this.state.scenes.slice(-2).some((scene) => {
+      const { descriptor } = scene;
+      const options = descriptor ? descriptor.options : {};
+      const { headerMode, headerTransparent, headerShown = true } = options;
 
-            if (headerTransparent || headerShown === false) {
-              return true;
-            }
+      if (
+        headerMode === 'float' &&
+        (headerTransparent || headerShown === false)
+      ) {
+        return true;
+      }
 
-            return false;
-          })
-        : false;
+      return false;
+    });
 
-    const floatingHeader =
-      headerMode === 'float' ? (
-        <React.Fragment key="header">
-          {renderHeader({
-            mode: 'float',
-            layout,
-            insets: { top, right, bottom, left },
-            scenes,
-            getPreviousScene: this.getPreviousScene,
-            getFocusedRoute: this.getFocusedRoute,
-            onContentHeightChange: this.handleHeaderLayout,
-            gestureDirection:
-              focusedOptions.gestureDirection !== undefined
-                ? focusedOptions.gestureDirection
-                : defaultTransitionPreset.gestureDirection,
-            styleInterpolator:
-              focusedOptions.headerStyleInterpolator !== undefined
-                ? focusedOptions.headerStyleInterpolator
-                : defaultTransitionPreset.headerStyleInterpolator,
-            style: [
-              styles.floating,
-              isFloatHeaderAbsolute && [
-                // Without this, the header buttons won't be touchable on Android when headerTransparent: true
-                { height: focusedHeaderHeight },
-                styles.absolute,
-              ],
+    const floatingHeader = (
+      <React.Fragment key="header">
+        {renderHeader({
+          mode: 'float',
+          layout,
+          insets: { top, right, bottom, left },
+          scenes,
+          getPreviousScene: this.getPreviousScene,
+          getFocusedRoute: this.getFocusedRoute,
+          onContentHeightChange: this.handleHeaderLayout,
+          style: [
+            styles.floating,
+            isFloatHeaderAbsolute && [
+              // Without this, the header buttons won't be touchable on Android when headerTransparent: true
+              { height: focusedHeaderHeight },
+              styles.absolute,
             ],
-          })}
-        </React.Fragment>
-      ) : null;
+          ],
+        })}
+      </React.Fragment>
+    );
 
     return (
       <React.Fragment>
@@ -537,12 +504,19 @@ export default class CardStack extends React.Component<Props, State> {
                 : 1;
             }
 
+            const defaultTransitionPreset =
+              scene.descriptor.options.presentation === 'modal'
+                ? ModalTransition
+                : DefaultTransition;
+
             const {
+              presentation,
               safeAreaInsets,
+              headerMode,
               headerShown = true,
               headerTransparent,
               cardShadowEnabled,
-              cardOverlayEnabled = Platform.OS !== 'ios' || mode === 'modal',
+              cardOverlayEnabled,
               cardOverlay,
               cardStyle,
               animationEnabled,
@@ -642,7 +616,7 @@ export default class CardStack extends React.Component<Props, State> {
                   onHeaderHeightChange={this.handleHeaderLayout}
                   getPreviousScene={this.getPreviousScene}
                   getFocusedRoute={this.getFocusedRoute}
-                  mode={mode}
+                  presentation={presentation}
                   headerMode={headerMode}
                   headerShown={headerShown}
                   hasAbsoluteHeader={

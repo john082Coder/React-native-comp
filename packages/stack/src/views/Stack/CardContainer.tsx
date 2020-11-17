@@ -31,7 +31,7 @@ type Props = TransitionPreset & {
   cardOverlay?: (props: {
     style: Animated.WithAnimatedValue<StyleProp<ViewStyle>>;
   }) => React.ReactNode;
-  cardOverlayEnabled: boolean;
+  cardOverlayEnabled?: boolean;
   cardShadowEnabled?: boolean;
   cardStyle?: StyleProp<ViewStyle>;
   getPreviousScene: (props: { route: Route<string> }) => Scene | undefined;
@@ -57,8 +57,8 @@ type Props = TransitionPreset & {
     horizontal?: number;
   };
   gestureVelocityImpact?: number;
-  mode: StackCardMode;
-  headerMode: StackHeaderMode;
+  presentation?: StackCardMode;
+  headerMode?: StackHeaderMode;
   headerShown: boolean;
   hasAbsoluteHeader: boolean;
   headerHeight: number;
@@ -87,10 +87,9 @@ function CardContainer({
   gestureVelocityImpact,
   getPreviousScene,
   getFocusedRoute,
-  mode,
+  presentation: mode,
   headerMode,
   headerShown,
-  headerStyleInterpolator,
   hasAbsoluteHeader,
   headerHeight,
   onHeaderHeightChange,
@@ -246,8 +245,6 @@ function CardContainer({
               scenes: [previousScene, scene],
               getPreviousScene,
               getFocusedRoute,
-              gestureDirection,
-              styleInterpolator: headerStyleInterpolator,
               onContentHeightChange: onHeaderHeightChange,
             })}
           </ModalPresentationContext.Provider>

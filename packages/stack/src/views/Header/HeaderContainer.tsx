@@ -10,6 +10,10 @@ import type { EdgeInsets } from 'react-native-safe-area-context';
 
 import Header from './Header';
 import {
+  DefaultTransition,
+  ModalTransition,
+} from '../../TransitionConfigs/TransitionPresets';
+import {
   forSlideLeft,
   forSlideUp,
   forNoAnimation,
@@ -19,10 +23,8 @@ import PreviousSceneContext from '../../utils/PreviousSceneContext';
 import type {
   Layout,
   Scene,
-  StackHeaderStyleInterpolator,
   StackNavigationProp,
   StackHeaderProps,
-  GestureDirection,
 } from '../../types';
 
 export type Props = {
@@ -36,8 +38,6 @@ export type Props = {
     route: Route<string>;
     height: number;
   }) => void;
-  styleInterpolator: StackHeaderStyleInterpolator;
-  gestureDirection: GestureDirection;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -49,8 +49,6 @@ export default function HeaderContainer({
   getPreviousScene,
   getFocusedRoute,
   onContentHeightChange,
-  gestureDirection,
-  styleInterpolator,
   style,
 }: Props) {
   const focusedRoute = getFocusedRoute();
@@ -63,10 +61,21 @@ export default function HeaderContainer({
           return null;
         }
 
-        const { header, headerShown = true, headerTransparent } =
-          scene.descriptor.options || {};
+        const defaultTransitionPreset =
+          scene.descriptor.options?.presentation === 'modal'
+            ? ModalTransition
+            : DefaultTransition;
 
-        if (!headerShown) {
+        const {
+          header,
+          headerMode,
+          headerShown = true,
+          headerTransparent,
+          headerStyleInterpolator = defaultTransitionPreset.headerStyleInterpolator,
+          gestureDirection = defaultTransitionPreset.gestureDirection,
+        } = scene.descriptor.options || {};
+
+        if (headerMode !== mode || !headerShown) {
           return null;
         }
 
@@ -80,18 +89,23 @@ export default function HeaderContainer({
         const previousDescriptor = self[i - 1]?.descriptor;
         const nextDescriptor = self[i + 1]?.descriptor;
 
-        const { headerShown: previousHeaderShown = true } =
-          previousDescriptor?.options || {};
+        const {
+          headerShown: previousHeaderShown = true,
+          headerMode: previousHeaderMode,
+        } = previousDescriptor?.options || {};
 
-        const { headerShown: nextHeaderShown = true } =
-          nextDescriptor?.options || {};
+        const {
+          headerShown: nextHeaderShown = true,
+          headerMode: nextHeaderMode,
+        } = nextDescriptor?.options || {};
 
         const isHeaderStatic =
-          (previousHeaderShown === false &&
+          ((previousHeaderShown === false || previousHeaderMode !== mode) &&
             // We still need to animate when coming back from next scene
             // A hacky way to check this is if the next scene exists
             !nextDescriptor) ||
-          nextHeaderShown === false;
+          nextHeaderShown === false ||
+          nextHeaderMode !== mode;
 
         const props: StackHeaderProps = {
           layout,
@@ -118,7 +132,7 @@ export default function HeaderContainer({
                   : gestureDirection === 'horizontal-inverted'
                   ? forSlideRight
                   : forSlideLeft
-                : styleInterpolator
+                : headerStyleInterpolator
               : forNoAnimation,
         };
 
