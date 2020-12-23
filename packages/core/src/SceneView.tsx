@@ -109,6 +109,56 @@ export default function SceneView<
     ? screen.getComponent()
     : screen.component;
 
+  if (process.env.NODE_ENV !== 'production') {
+    // For development builds, we warn if the function reference changes between renders
+    // We consider function name and content and only warn if they are the same, should work for most cases
+    // The hook lint rules aren't applicable since the condition doesn't change at runtime
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const previousComponentRef = React.useRef(ScreenComponent);
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    React.useEffect(() => {
+      previousComponentRef.current = ScreenComponent;
+    });
+
+    const PreviousScreenComponent = previousComponentRef.current;
+
+    if (
+      PreviousScreenComponent !== ScreenComponent &&
+      PreviousScreenComponent?.name === ScreenComponent?.name &&
+      PreviousScreenComponent?.toString() === ScreenComponent?.toString()
+    ) {
+      const message =
+        `You passed a different component for the screen '${route.name}' in the 'component' prop than previous render. ` +
+        `The component passed for a screen should be the same across renders, ` +
+        `otherwise the screen will remount causing local state of the component to be lost and cause perf issues. ` +
+        `If you didn't intentionally pass a different component, you're probably creating components during render. ` +
+        `For example:\n\n` +
+        `function App() {\n` +
+        `  const Home = () => <Something />;\n\n` +
+        `  return (\n` +
+        `    <Stack.Navigator>\n` +
+        `      <Stack.Screen name="Home" component={Home} />\n` +
+        `    </Stack.Navigator>\n` +
+        `  );\n` +
+        `}\n\n` +
+        `To fix this, move the component to the top-level of the file:\n\n` +
+        `const Home = () => <Something />;\n\n` +
+        `function App() {\n` +
+        `  return (\n` +
+        `    <Stack.Navigator>\n` +
+        `      <Stack.Screen name="Home" component={Home} />\n` +
+        `    </Stack.Navigator>\n` +
+        `  );\n` +
+        `}\n\n` +
+        `If this was intentional, make sure that the name of the function passed in the 'component' prop changes as well to hide the warning.\n\n` +
+        'See: https://reactnavigation.org/docs/troubleshooting/#screens-are-unmountingremounting-during-navigation';
+
+      console.warn(message);
+    }
+  }
+
   return (
     <NavigationStateContext.Provider value={context}>
       <EnsureSingleNavigator>

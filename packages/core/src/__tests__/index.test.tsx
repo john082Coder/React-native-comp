@@ -1982,3 +1982,82 @@ it('does not throw if while getting current options with empty container', () =>
 
   expect(navigation.current?.getCurrentOptions()).toEqual(undefined);
 });
+
+it('shows warning if screen component reference changes between renders', () => {
+  const TestNavigator = (props: any): any => {
+    const { state, descriptors } = useNavigationBuilder(MockRouter, props);
+
+    return state.routes.map((route) => descriptors[route.key].render());
+  };
+
+  const getContainer = () => (
+    <BaseNavigationContainer>
+      <TestNavigator>
+        <Screen
+          name="foo"
+          component={function A() {
+            return null;
+          }}
+        />
+      </TestNavigator>
+    </BaseNavigationContainer>
+  );
+
+  const spy = jest.spyOn(console, 'warn').mockImplementation();
+
+  const root = render(getContainer());
+
+  expect(spy).not.toHaveBeenCalled();
+
+  root.update(getContainer());
+
+  expect(spy).toHaveBeenCalled();
+  expect(spy.mock.calls[0][0]).toMatch(
+    "You passed a different component for the screen 'foo' in the 'component' prop than previous render."
+  );
+
+  spy.mockRestore();
+});
+
+it("doesn't show warning if screen component name or content has changed along with reference", () => {
+  const TestNavigator = (props: any): any => {
+    const { state, descriptors } = useNavigationBuilder(MockRouter, props);
+
+    return state.routes.map((route) => descriptors[route.key].render());
+  };
+
+  const getContainer = (component: React.ComponentType<any>) => (
+    <BaseNavigationContainer>
+      <TestNavigator>
+        <Screen name="foo" component={component} />
+      </TestNavigator>
+    </BaseNavigationContainer>
+  );
+
+  const spy = jest.spyOn(console, 'warn').mockImplementation();
+
+  const root = render(
+    getContainer(function A() {
+      return null;
+    })
+  );
+
+  root.update(
+    getContainer(function B() {
+      return null;
+    })
+  );
+
+  expect(spy).not.toHaveBeenCalled();
+
+  root.update(
+    getContainer(function B() {
+      'different';
+      return null;
+    })
+  );
+
+  expect(spy).not.toHaveBeenCalled();
+
+  spy.mockRestore();
+});

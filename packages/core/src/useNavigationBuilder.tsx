@@ -162,7 +162,7 @@ const getRouteConfigsFromChildren = <
           // It's relatively safe to assume that it's not a component since it should also have PascalCase name
           // We won't catch all scenarios here, but this should catch a good chunk of incorrect use.
           console.warn(
-            `Looks like you're passing an inline function for 'component' prop for the screen '${name}' (e.g. component={() => <SomeComponent />}). Passing an inline function will cause the component state to be lost on re-render and cause perf issues since it's re-created every render. You can pass the function as children to 'Screen' instead to achieve the desired behaviour.`
+            `Looks like you're passing an inline function for 'component' prop for the screen '${name}' (e.g. component={() => <SomeComponent />}). Passing an inline function will cause the local state of the component to be lost on re-render and cause perf issues since it's re-created every render. You can pass the function as children to 'Screen' instead to achieve the desired behaviour.`
           );
         }
       } else {

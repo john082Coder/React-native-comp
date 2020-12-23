@@ -184,7 +184,7 @@ it('fires focus and blur events in nested navigator', () => {
   const fourthFocusCallback = jest.fn();
   const fourthBlurCallback = jest.fn();
 
-  const createComponent = (focusCallback: any, blurCallback: any) => ({
+  const renderScreen = (focusCallback: any, blurCallback: any) => ({
     navigation,
   }: any) => {
     React.useEffect(() => navigation.addListener('focus', focusCallback), [
@@ -204,31 +204,21 @@ it('fires focus and blur events in nested navigator', () => {
   const element = (
     <BaseNavigationContainer>
       <TestNavigator ref={parent}>
-        <Screen
-          name="first"
-          component={createComponent(firstFocusCallback, firstBlurCallback)}
-        />
-        <Screen
-          name="second"
-          component={createComponent(secondFocusCallback, secondBlurCallback)}
-        />
+        <Screen name="first">
+          {renderScreen(firstFocusCallback, firstBlurCallback)}
+        </Screen>
+        <Screen name="second">
+          {renderScreen(secondFocusCallback, secondBlurCallback)}
+        </Screen>
         <Screen name="nested">
           {() => (
             <TestNavigator ref={child}>
-              <Screen
-                name="third"
-                component={createComponent(
-                  thirdFocusCallback,
-                  thirdBlurCallback
-                )}
-              />
-              <Screen
-                name="fourth"
-                component={createComponent(
-                  fourthFocusCallback,
-                  fourthBlurCallback
-                )}
-              />
+              <Screen name="third">
+                {renderScreen(thirdFocusCallback, thirdBlurCallback)}
+              </Screen>
+              <Screen name="fourth">
+                {renderScreen(fourthFocusCallback, fourthBlurCallback)}
+              </Screen>
             </TestNavigator>
           )}
         </Screen>
