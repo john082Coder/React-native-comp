@@ -1,5 +1,6 @@
-import * as Updates from 'expo-updates';
+// @ts-expect-error: this module doesn't have definitions
+import Restart from 'react-native-restart';
 
 export function restartApp() {
-  Updates.reloadAsync();
+  Restart.Restart();
 }
