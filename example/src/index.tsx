@@ -36,7 +36,10 @@ import {
   StackScreenProps,
   HeaderStyleInterpolators,
 } from '@react-navigation/stack';
-import { useReduxDevToolsExtension } from '@react-navigation/devtools';
+import {
+  useReduxDevToolsExtension,
+  useFlipper,
+} from '@react-navigation/devtools';
 
 import { restartApp } from './Restart';
 import LinkingPrefixes from './LinkingPrefixes';
@@ -199,6 +202,7 @@ export default function App() {
   const navigationRef = React.useRef<NavigationContainerRef>(null);
 
   useReduxDevToolsExtension(navigationRef);
+  useFlipper(navigationRef);
 
   if (!isReady) {
     return null;
