@@ -52,10 +52,7 @@ type Props = ViewProps & {
   overlayEnabled: boolean;
   shadowEnabled: boolean;
   gestureEnabled: boolean;
-  gestureResponseDistance?: {
-    vertical?: number;
-    horizontal?: number;
-  };
+  gestureResponseDistance?: number;
   gestureVelocityImpact: number;
   transitionSpec: {
     open: TransitionSpec;
@@ -406,13 +403,11 @@ export default class Card extends React.Component<Props> {
     const { layout, gestureDirection, gestureResponseDistance } = this.props;
 
     const distance =
-      gestureDirection === 'vertical' ||
-      gestureDirection === 'vertical-inverted'
-        ? gestureResponseDistance?.vertical !== undefined
-          ? gestureResponseDistance.vertical
-          : GESTURE_RESPONSE_DISTANCE_VERTICAL
-        : gestureResponseDistance?.horizontal !== undefined
-        ? gestureResponseDistance.horizontal
+      gestureResponseDistance !== undefined
+        ? gestureResponseDistance
+        : gestureDirection === 'vertical' ||
+          gestureDirection === 'vertical-inverted'
+        ? GESTURE_RESPONSE_DISTANCE_VERTICAL
         : GESTURE_RESPONSE_DISTANCE_HORIZONTAL;
 
     if (gestureDirection === 'vertical') {
