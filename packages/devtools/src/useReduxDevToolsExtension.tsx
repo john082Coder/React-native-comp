@@ -31,19 +31,7 @@ export default function useReduxDevToolsExtension(
     });
   }
 
-  React.useEffect(
-    () =>
-      devToolsRef.current?.subscribe((message) => {
-        if (message.type === 'DISPATCH' && message.state) {
-          const state = JSON.parse(message.state);
-
-          ref.current?.resetRoot(state);
-        }
-      }),
-    [ref]
-  );
-
-  useDevToolsBase(ref, (...args) => {
+  const { resetRoot } = useDevToolsBase(ref, (...args) => {
     const devTools = devToolsRef.current;
 
     if (!devTools) {
@@ -59,4 +47,16 @@ export default function useReduxDevToolsExtension(
         break;
     }
   });
+
+  React.useEffect(
+    () =>
+      devToolsRef.current?.subscribe((message) => {
+        if (message.type === 'DISPATCH' && message.state) {
+          const state = JSON.parse(message.state);
+
+          resetRoot(state);
+        }
+      }),
+    [resetRoot]
+  );
 }

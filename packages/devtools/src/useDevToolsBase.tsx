@@ -21,6 +21,7 @@ export default function useDevToolsBase(
   const lastStateRef = React.useRef<NavigationState | undefined>();
   const lastActionRef = React.useRef<NavigationAction | undefined>();
   const callbackRef = React.useRef(callback);
+  const lastResetRef = React.useRef<NavigationState | undefined>(undefined);
 
   React.useEffect(() => {
     callbackRef.current = callback;
@@ -63,12 +64,16 @@ export default function useDevToolsBase(
 
       unsubscribeState = navigation.addListener('state', (e) => {
         // Don't show the action in dev tools if the state is what we sent to reset earlier
-        if (lastStateRef.current === e.data.state) {
+        if (
+          lastResetRef.current &&
+          deepEqual(lastResetRef.current, e.data.state)
+        ) {
+          lastStateRef.current = undefined;
           return;
         }
 
-        const lastState = lastStateRef.current;
         const state = navigation.getRootState();
+        const lastState = lastStateRef.current;
         const action = lastActionRef.current;
 
         lastActionRef.current = undefined;
@@ -91,4 +96,16 @@ export default function useDevToolsBase(
       clearTimeout(timer);
     };
   }, [ref]);
+
+  const resetRoot = React.useCallback(
+    (state: NavigationState) => {
+      if (ref.current) {
+        lastResetRef.current = state;
+        ref.current.resetRoot(state);
+      }
+    },
+    [ref]
+  );
+
+  return { resetRoot };
 }
