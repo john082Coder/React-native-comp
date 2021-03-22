@@ -9,7 +9,7 @@ export default function useFlipper(
 ) {
   const connectionRef = React.useRef<Flipper.FlipperConnection>();
 
-  useDevToolsBase(ref, (...args) => {
+  const { resetRoot } = useDevToolsBase(ref, (...args) => {
     const connection = connectionRef.current;
 
     if (!connection) {
@@ -40,6 +40,13 @@ export default function useFlipper(
       },
       async onConnect(connection) {
         connectionRef.current = connection;
+
+        connection.receive('invoke', ({ method, params }) =>
+          // @ts-expect-error: we want to call arbitrary methods here
+          ref.current?.[method](params)
+        );
+
+        connection.receive('resetRoot', (state) => resetRoot(state));
       },
       onDisconnect() {
         connectionRef.current = undefined;
@@ -48,5 +55,5 @@ export default function useFlipper(
         return false;
       },
     });
-  }, [ref]);
+  }, [ref, resetRoot]);
 }
