@@ -3,6 +3,7 @@ import { styled } from 'flipper';
 import { Tabs } from 'antd';
 import { useStore } from './useStore';
 import { Logs } from './Logs';
+import { LinkingTester } from './LinkingTester';
 
 const { TabPane } = Tabs;
 
@@ -14,8 +15,8 @@ export function Component() {
       <TabsContent tab={<TabLabel>Logs</TabLabel>} key="1">
         <Logs {...store} />
       </TabsContent>
-      <TabsContent tab={<TabLabel>Test</TabLabel>} key="2">
-        Test Tab
+      <TabsContent tab={<TabLabel>Linking</TabLabel>} key="2">
+        <LinkingTester />
       </TabsContent>
     </Tabs>
   );

@@ -8,6 +8,7 @@ import {
   VirtualList,
   styled,
 } from 'flipper';
+import * as fonts from './fonts';
 import type { StoreType, Log } from './types';
 
 export function Logs({ logs, index, resetTo }: StoreType) {
@@ -76,8 +77,7 @@ const Row = styled.button<{ selected: boolean; faded: boolean }>((props) => ({
   'display': 'flex',
   'alignItems': 'center',
   'justifyContent': 'space-between',
-  'fontFamily':
-    'SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace',
+  'fontFamily': fonts.monospace,
   'textAlign': 'left',
   'padding': '12px 18px',
   'color': props.selected ? '#fff' : '#000',

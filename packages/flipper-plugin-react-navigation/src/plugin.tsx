@@ -1,6 +1,5 @@
 import { PluginClient, createState } from 'flipper-plugin';
-import type { NavigationState } from '@react-navigation/core';
-import type { Log } from './types';
+import type { Log, NavigationState } from './types';
 
 type Events = {
   action: Log;

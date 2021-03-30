@@ -1,4 +1,13 @@
-import type { NavigationState, NavigationAction } from '@react-navigation/core';
+export type NavigationState = {
+  key: string;
+  index: number;
+  routes: { key: string; name: string; params?: object }[];
+};
+
+export type NavigationAction = {
+  type: string;
+  payload: object;
+};
 
 export type Log = {
   id: string;
